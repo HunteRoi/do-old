@@ -6,6 +6,7 @@
 *.cjs.map
 *.mjs.map
 
+/node_modules
 /.yarn/*
 !/.yarn/cache
 !/.yarn/cache/**
