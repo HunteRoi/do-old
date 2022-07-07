@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "node: current",
+            "type": "node",
+            "console": "integratedTerminal",
+            "program": "${file}",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**",
+                "**/node_modules/**",
+                "**/.pnp.cjs",
+                "**/.pnp.loader.mjs"
+            ],
+            "autoAttachChildProcesses": true,
+            "env": {
+                "NODE_OPTIONS": "--require ${workspaceFolder}/.pnp.cjs"
+            },
+        },
+    ]
+}
