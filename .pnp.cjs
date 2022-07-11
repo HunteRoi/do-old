@@ -41,6 +41,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/react", "npm:18.0.15"],\
             ["@types/react-dom", "npm:18.0.6"],\
             ["@types/testing-library__jest-dom", "npm:5.14.5"],\
+            ["@types/uuid", "npm:8.3.4"],\
             ["@yarnpkg/pnpify", "npm:4.0.0-rc.11"],\
             ["del-cli", "npm:4.0.1"],\
             ["firebase", "npm:9.9.0"],\
@@ -51,6 +52,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-router-dom", "virtual:3585b6ffb631483b78bf7963ceffd19a8719af3e3db244a034fcf3a11fc31de32c5e3b6040683e053bfabd3034ec9451a18408739a624b3f453a30a851a6d50e#npm:6.3.0"],\
             ["react-scripts", "virtual:3585b6ffb631483b78bf7963ceffd19a8719af3e3db244a034fcf3a11fc31de32c5e3b6040683e053bfabd3034ec9451a18408739a624b3f453a30a851a6d50e#npm:5.0.1"],\
             ["typescript", "patch:typescript@npm%3A4.7.4#~builtin<compat/typescript>::version=4.7.4&hash=7ad353"],\
+            ["uuid", "npm:8.3.2"],\
             ["web-vitals", "npm:2.1.4"]\
           ],\
           "linkType": "SOFT"\
@@ -6010,6 +6012,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@types/uuid", [\
+        ["npm:8.3.4", {\
+          "packageLocation": "./.yarn/cache/@types-uuid-npm-8.3.4-7547f4402c-6f11f3ff70.zip/node_modules/@types/uuid/",\
+          "packageDependencies": [\
+            ["@types/uuid", "npm:8.3.4"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@types/ws", [\
         ["npm:8.5.3", {\
           "packageLocation": "./.yarn/cache/@types-ws-npm-8.5.3-ae52c483f1-0ce46f850d.zip/node_modules/@types/ws/",\
@@ -9987,6 +9998,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/react", "npm:18.0.15"],\
             ["@types/react-dom", "npm:18.0.6"],\
             ["@types/testing-library__jest-dom", "npm:5.14.5"],\
+            ["@types/uuid", "npm:8.3.4"],\
             ["@yarnpkg/pnpify", "npm:4.0.0-rc.11"],\
             ["del-cli", "npm:4.0.1"],\
             ["firebase", "npm:9.9.0"],\
@@ -9997,6 +10009,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-router-dom", "virtual:3585b6ffb631483b78bf7963ceffd19a8719af3e3db244a034fcf3a11fc31de32c5e3b6040683e053bfabd3034ec9451a18408739a624b3f453a30a851a6d50e#npm:6.3.0"],\
             ["react-scripts", "virtual:3585b6ffb631483b78bf7963ceffd19a8719af3e3db244a034fcf3a11fc31de32c5e3b6040683e053bfabd3034ec9451a18408739a624b3f453a30a851a6d50e#npm:5.0.1"],\
             ["typescript", "patch:typescript@npm%3A4.7.4#~builtin<compat/typescript>::version=4.7.4&hash=7ad353"],\
+            ["uuid", "npm:8.3.2"],\
             ["web-vitals", "npm:2.1.4"]\
           ],\
           "linkType": "SOFT"\

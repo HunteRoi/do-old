@@ -1,9 +1,9 @@
 import { AttendeeChoices } from './AttendeeChoices';
-import { TimeRange } from './TimeRange';
 
 export type Event = {
+    id: string;
     title: string;
     description?: string;
-    timeRange: TimeRange;
+    selectedDates: Date[];
     attendeesChoices: AttendeeChoices[];
 };
