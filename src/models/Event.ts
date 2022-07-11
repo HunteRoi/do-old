@@ -1,5 +1,5 @@
-import { AttendeeChoices } from "./AttendeeChoices";
-import { TimeRange } from "./TimeRange";
+import { AttendeeChoices } from './AttendeeChoices';
+import { TimeRange } from './TimeRange';
 
 export type Event = {
     title: string;
