@@ -1,10 +1,12 @@
 import { initializeApp } from 'firebase/app';
 import { signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, AuthProvider, getAuth } from 'firebase/auth';
+import { doc, getFirestore, setDoc } from 'firebase/firestore';
 
 import { firebaseConfig } from './';
 
 initializeApp(firebaseConfig);
 const auth = getAuth();
+const db = getFirestore();
 
 export const Providers = {
     google: new GoogleAuthProvider(),
@@ -14,7 +16,9 @@ export const Providers = {
 export const signIn = async (provider: AuthProvider) => {
     auth.useDeviceLanguage();
     try {
-        await signInWithPopup(auth, provider);
+        const credentials = await signInWithPopup(auth, provider);
+        const userRef = doc(db, 'users', credentials.user.uid);
+        await setDoc(userRef, credentials.user.providerData[0], { merge: true });
     } catch (err) {
         console.error(err);
     }

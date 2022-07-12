@@ -19,10 +19,10 @@ const LoginPage: React.FC = () => {
        return <Navigate to='/' />;
     }
 
-    return <div>
+    return <>
         <button disabled={isAuthenticating} onClick={() => onSignInClick(Providers.google)}>Log in with Google</button>
         <button disabled={isAuthenticating} onClick={() => onSignInClick(Providers.facebook)}>Log in with Facebook</button>
-    </div>
-}
+    </>
+};
 
 export default LoginPage;

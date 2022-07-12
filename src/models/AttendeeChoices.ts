@@ -1,7 +1,7 @@
 import { UserInfo } from 'firebase/auth';
-import { Choice } from './Choice';
+import { DateStatus as ChoiceStatus } from './DateStatus';
 
 export type AttendeeChoices = {
     attendee: UserInfo;
-    choices: Choice[];
+    status: ChoiceStatus;
 };
