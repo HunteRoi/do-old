@@ -7,7 +7,7 @@ src/config/index.ts
 *.cjs.map
 *.mjs.map
 
-/node_modules
+/node_modules/**
 /.yarn/*
 !/.yarn/cache
 !/.yarn/cache/**
