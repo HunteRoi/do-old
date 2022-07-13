@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
+
+import { createEvent, signOut } from '../config/firebase';
 import EventForm from '../components/EventForm';
-import { signOut } from '../config/firebase';
 import { Event } from '../models';
 
 const HomePage: React.FC = () => {
@@ -13,6 +14,8 @@ const HomePage: React.FC = () => {
 
     const onSubmit = async (event: Event) => {
         console.log(event);
+        await createEvent(event);
+        navigate(`/event/${event.id}`);
     };
 
     return <>

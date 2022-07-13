@@ -11,8 +11,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "watch": "tsc --watch",
-    "clean": "del-cli \"**/*.js\" \"**/*.js.map\" \"**/*.mjs\" \"**/*.mjs.map\" \"**/*.cjs\" \"**/*.cjs.map\" \"!node_modules\" \"coverage/\" \".nyc_output/\""
+    "watch": "tsc --watch"
   },
   "browserslist": {
     "production": [

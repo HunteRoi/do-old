@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, AuthProvider, getAuth } from 'firebase/auth';
 import { doc, getFirestore, setDoc } from 'firebase/firestore';
+import { Event } from '../models';
 
 import { firebaseConfig } from './';
 
@@ -30,4 +31,9 @@ export const signOut = async () => {
     } catch (err) {
         console.error(err);
     }
+};
+
+export const createEvent = async (event: Event) => {
+    const docRef = doc(db, 'events', event.id);
+    await setDoc(docRef, event);
 };
