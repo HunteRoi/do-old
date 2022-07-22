@@ -1,69 +1,87 @@
 import { FormEvent, useState } from 'react';
 import { v4 as generateUuid } from 'uuid';
 import { Timestamp } from 'firebase/firestore';
+import { TextField, Box, Button } from '@mui/material';
+import { EventNote } from '@mui/icons-material';
+import dayjs from 'dayjs';
 
 import { Event } from '../models';
 import useFormElement from '../hooks/useFormElement';
+import MultipleDatesPicker from './MultipleDatesPicker';
+import { getAuth } from 'firebase/auth';
+import getPhotoURL from '../hooks/getPhotoURL';
 
 type EventFormProps = {
     onFormSubmit: (event: Event) => Promise<void>
 };
 
 const EventForm: React.FC<EventFormProps> = ({ onFormSubmit }) => {
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    const nowAsString = Intl.DateTimeFormat('fr-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
+    const now = dayjs().hour(0).minute(0).second(0).millisecond(0);
     const titleInput = useFormElement<HTMLInputElement, string>('');
-    const descriptionInput = useFormElement<HTMLTextAreaElement, string>('');;
-    const date1Input = useFormElement<HTMLInputElement, string>(nowAsString);
-    const date2Input = useFormElement<HTMLInputElement, string>(nowAsString);
+    const descriptionInput = useFormElement<HTMLTextAreaElement, string>('');
+    const [values, setValues] = useState([
+        dayjs().hour(0).minute(0).second(0).millisecond(0)
+    ]);
     const [submitting, setSubmitting] = useState(false);
+    const auth = getAuth();
 
     const onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         event.stopPropagation();
         setSubmitting(true);
 
-        const date1 = new Date(date1Input.value);
-        date1.setHours(0, 0, 0, 0);
-        const date2 = new Date(date2Input.value);
-        date2.setHours(0, 0, 0, 0);
+        if (!titleInput.element.value) {
+            titleInput.setError(true);
+        }
 
-        if (!titleInput.value || date1 < now || date2 < now) {
+        if (!titleInput.element.value) {
             setSubmitting(false);
             return;
         }
 
+        const providerData = auth.currentUser!.providerData[0];
+        const photoURL = await getPhotoURL(providerData);
+
         const newEvent: Event = {
             id: generateUuid(),
-            title: titleInput.value,
-            description: descriptionInput.value,
-            attendanceData: [
-                {
-                    date: Timestamp.fromDate(date1),
-                    attendeesChoices: []
-                },
-                {
-                    date: Timestamp.fromDate(date2),
-                    attendeesChoices: []
-                }
-            ],
+            title: titleInput.element.value,
+            description: descriptionInput.element.value,
+            attendanceData: values.map(day => ({
+                date: Timestamp.fromDate(day.hour(0).minute(0).second(0).millisecond(0).toDate()),
+                attendeesChoices: []
+            })),
+            creationDate: Timestamp.fromDate(dayjs().hour(0).minute(0).second(0).millisecond(0).toDate()),
+            creator: { ...providerData, photoURL }
         };
         await onFormSubmit(newEvent);
         setSubmitting(false);
     };
 
-    return <form onSubmit={onSubmitClick}>
-        <input type='text' placeholder='Event title' id='title' {...titleInput} required />
-        <textarea id='description' placeholder='Event description' {...descriptionInput} />
+    return <Box onSubmit={onSubmitClick}
+        component='form'
+        sx={{
+            '& .MuiTextField-root': { m: 1, width: '25ch' },
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center',
+            m: 2
+        }}
+        noValidate autoComplete='off'
+    >
+        <TextField
+            variant='outlined' id='title' label='Event title' required
+            {...titleInput.element}
+            InputProps={{
+                startAdornment: (<EventNote sx={{ color: 'action.active', mr: 1, my: 0.5 }} />)
+            }}
+            sx={{width: '100px'}}
+        />
 
-        <div>
-            <input type='date' id='date1' min={nowAsString} {...date1Input} required />
-            <input type='date' id='date2' min={nowAsString} {...date2Input} required />
-        </div>
+        <TextField multiline variant='outlined' id='description' label='Event Description' {...descriptionInput.element} minRows={3} />
 
-        <input type='submit' disabled={submitting} />
-    </form>;
+        <MultipleDatesPicker inputFormat='DD/MM/YYYY' minDate={now} values={values} setValues={setValues} />
+
+        <Button variant='contained' type='submit' disabled={submitting}>Submit</Button>
+    </Box>;
 };
 
 export default EventForm;

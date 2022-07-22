@@ -1,4 +1,4 @@
-import { doc, getFirestore, onSnapshot, setDoc, CollectionReference, collection } from 'firebase/firestore';
+import { doc, getFirestore, onSnapshot, updateDoc, CollectionReference, collection } from 'firebase/firestore';
 import { useEffect, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -30,7 +30,7 @@ const getEvent = (): GetEventReturnType => {
             if (index === -1) attendance.attendeesChoices.push({ attendee: data.attendee, status: choiceForDate?.status ?? null });
             else attendance.attendeesChoices[index].status = choiceForDate?.status ?? null;
         }
-        await setDoc(docRef, { attendanceData }, { merge: true });
+        await updateDoc(docRef, 'attendanceData', attendanceData);
     }, [event]);
 
     useEffect(() => {

@@ -1,96 +1,89 @@
 import { getAuth } from 'firebase/auth';
+import { Avatar, Typography } from '@mui/material';
+import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
+import dayjs from 'dayjs';
+import { UserInfo } from 'firebase/auth';
 import { Timestamp } from 'firebase/firestore';
-import { FormEvent, useState } from 'react';
-import { facebookConfig } from '../config';
 
-import useFormElement from '../hooks/useFormElement';
-import { AttendingChoices, ChoiceStatus } from '../models';
+import { AttendanceData, AttendingChoices, ChoiceStatus, ChoiceStatusEnum } from '../models';
+import ThreeStateCheckbox from './ThreeStateCheckbox';
 
 type ParticipationFormProps = {
-    acceptedDatesInMilliseconds: number[],
+    attendanceData: AttendanceData[];
     onFormSubmit: (data: AttendingChoices) => Promise<void>
 };
 
-function isChoiceStatus(value: string | null): value is ChoiceStatus {
-    return ['going', 'maybe', null].includes(value);
+type AttendeeChoicesPerDate = {
+    attendee: UserInfo,
+    dateChoices: DateChoice[];
 }
 
-const ParticipationForm: React.FC<ParticipationFormProps> = ({ acceptedDatesInMilliseconds, onFormSubmit }) => {
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    const nowAsString = Intl.DateTimeFormat('fr-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
-    const date1Input = useFormElement<HTMLInputElement, string>(nowAsString);
-    const choice1Input = useFormElement<HTMLInputElement, string>('');
-    const date2Input = useFormElement<HTMLInputElement, string>(nowAsString);
-    const choice2Input = useFormElement<HTMLInputElement, string>('');
-    const [submitting, setSubmitting] = useState(false);
+type DateChoice = { timestamp: Timestamp, choice: ChoiceStatus };
+
+const ParticipationForm: React.FC<ParticipationFormProps> = ({ attendanceData }) => {
     const auth = getAuth();
+    const columns = [
+        {
+            headerName: 'Attendees',
+            field: 'attendee',
+            renderCell: (params: GridRenderCellParams<UserInfo>) => (
+                <>
+                    <Avatar sx={{ width: 24, height: 24, mr: 1 }} alt={params.value?.displayName ?? undefined} src={params.value?.photoURL ?? undefined} />
+                    <Typography>{params.value?.displayName}</Typography>
+                </>
+            ),
+            flex: .3,
+            minWidth: 200
+        },
+        ...attendanceData
+            .map(d => ({
+                flex: .2,
+                minWidth: 150,
+                field: `${d.date.valueOf()}-choice`,
+                renderHeader: () => (
+                    <Typography>{dayjs(d.date.toDate()).format('DD/MM/YYYY')}</Typography>
+                ),
+                editable: true,
+                renderCell: (params: GridRenderCellParams<ChoiceStatus>) => (
+                    <ThreeStateCheckbox state={params.value} />
+                ),
+                valueOptions: [ChoiceStatusEnum.GOING, ChoiceStatusEnum.MAYBE, 'NONE'],
+                type: 'singleSelect'
+            }))
+    ];
 
-    const onSubmitClick = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        event.stopPropagation();
-        setSubmitting(true);
-
-        const date1 = new Date(date1Input.value);
-        date1.setHours(0, 0, 0, 0);
-        const date2 = new Date(date2Input.value);
-        date2.setHours(0, 0, 0, 0);
-        const choice1 = choice1Input.value || null;
-        const choice2 = choice2Input.value || null;
-
-        if (!isChoiceStatus(choice1) || !isChoiceStatus(choice2)
-            || acceptedDatesInMilliseconds.filter(date => date === date1.valueOf()).length !== 1
-            || acceptedDatesInMilliseconds.filter(date => date === date2.valueOf()).length !== 1
-        ) {
-            setSubmitting(false);
-            return;
+    const attendanceDataPerUser = attendanceData.reduce<Map<string, AttendeeChoicesPerDate>>((seed, current) => {
+        for(const attendeeChoice of current.attendeesChoices) {
+            if (seed.has(attendeeChoice.attendee.uid)) {
+                seed.get(attendeeChoice.attendee.uid)!.dateChoices.push({
+                    timestamp: current.date,
+                    choice: attendeeChoice.status
+                });
+            } else {
+                seed.set(attendeeChoice.attendee.uid, { attendee: attendeeChoice.attendee, dateChoices: [{ timestamp: current.date, choice: attendeeChoice.status }] });
+            }
         }
+        return seed;
+    }, new Map());
 
-        const providerData = auth.currentUser!.providerData[0];
-        let photoURL = providerData.photoURL;
-        if (providerData.providerId === 'facebook.com') {
-            const token = `${facebookConfig.appId}|${facebookConfig.appSecret}`;
-            const response = await fetch(`${photoURL}?access_token=${token}&redirect=0`);
-            const json = await response.json();
-            photoURL = json.data.url;
-        }
+    const rows = [
+        ...[...attendanceDataPerUser.values()].map(data => {
+            const row: any = { attendee: data.attendee, id: data.attendee.uid, editable: auth.currentUser?.uid === data.attendee.uid };
+            for(const dateChoice of data.dateChoices) {
+                row[`${dateChoice.timestamp.valueOf()}-choice`] = dateChoice.choice;
+            }
+            return row;
+        })
+    ];
 
-        const attendanceData: AttendingChoices = {
-            attendee:  { ...providerData, photoURL },
-            choices: []
-        };
-
-        if (choice1) {
-            attendanceData.choices.push({
-                date: Timestamp.fromDate(date1),
-                status: choice1
-            })
-        }
-        if (choice2) {
-            attendanceData.choices.push({
-                date: Timestamp.fromDate(date2),
-                status: choice2
-
-            });
-        }
-
-        await onFormSubmit(attendanceData);
-        setSubmitting(false);
-    };
-
-    return <form onSubmit={onSubmitClick}>
-            <div>
-                <input type='date' id='date1' {...date1Input} required />
-                <input type='text' id='choice1' {...choice1Input} />
-            </div>
-
-            <div>
-                <input type='date' id='date1' {...date2Input} required />
-                <input type='text' id='choice2' {...choice2Input} />
-            </div>
-
-            <input type='submit' disabled={submitting}/>
-    </form>;
+    return <DataGrid
+        autoHeight
+        sx={{ width: '100%' }}
+        experimentalFeatures={{ newEditingApi: true }}
+        columns={columns}
+        rows={rows}
+        editMode='row'
+    />;
 };
 
 export default ParticipationForm;

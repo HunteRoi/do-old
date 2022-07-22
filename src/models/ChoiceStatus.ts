@@ -1,1 +1,6 @@
-export type ChoiceStatus = 'going' | 'maybe' | null;
+export enum ChoiceStatusEnum {
+    GOING = 'going',
+    MAYBE = 'maybe'
+}
+
+export type ChoiceStatus = ChoiceStatusEnum | null;

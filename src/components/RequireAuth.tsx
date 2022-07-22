@@ -1,6 +1,7 @@
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
+import { CircularProgress } from '@mui/material';
 
 type RequireAuthProps = {
     routeWhenUnauthenticated: string
@@ -23,7 +24,7 @@ const RequireAuth: React.FC<RequireAuthProps> = ({ routeWhenUnauthenticated, chi
         return checkAuthentication();
     }, [auth]);
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) return <CircularProgress aria-label='Loading...' />;
 
     return <>{children}</>;
 };
