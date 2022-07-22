@@ -1,11 +1,12 @@
-import { Box, Container } from '@mui/material';
-import { LoadingButton } from '@mui/lab';
-import { Facebook, Google } from '@mui/icons-material';
+import { Box, Container, Button, Icon, Typography } from '@mui/material';
 import { FacebookAuthProvider, getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { useState } from 'react';
 import { useNavigate, Navigate, useLocation } from 'react-router-dom';
 
 import { Providers, signIn } from '../config/firebase';
+
+const Google = () => <Icon sx={{ textAlign: 'center' }}><img style={{ display: 'flex', height: 'inherit', width: 'inherit' }} src='/svg/google.svg' alt='Google' /></Icon>;
+const Facebook = () => <Icon sx={{ textAlign: 'center' }}><img style={{ display: 'flex', height: 'inherit', width: 'inherit' }} src='/svg/facebook.svg' alt='Facebook' /></Icon>;
 
 const LoginPage: React.FC = () => {
     const auth = getAuth();
@@ -26,10 +27,25 @@ const LoginPage: React.FC = () => {
        return <Navigate to='/' />;
     }
 
-    return <Container maxWidth='xs'>
+    return <Container maxWidth='xs' sx={{ my: 5 }}>
+        <Box sx={{ my: 2 }}>
+            <Typography variant='h3' sx={{ my: 1 }}>
+                Welcome on DoOld, a clone of the old Doodle interface!
+            </Typography>
+            <Typography variant='body1'>
+                Here, no need to fill impossible forms only to know when your friends are available for a drink.
+                <br />
+                <br />
+                Give a title to your event, choose some dates and create! You then only have to share your event with your friends or colleagues and let them submit their info!
+                <br />
+                <br />
+                And in case your friends submitted shit in their attendance, you can still edit their rows 😉
+            </Typography>
+        </Box>
+
         <Box sx={{ display: 'grid', gap: 1, gridTemplateRows: 'repeat(2, 1fr)' }}>
-            <LoadingButton color='warning' variant='contained' disabled={isAuthenticating} startIcon={<Google />} onClick={() => onSignInClick(Providers.google)}>Log in with Google</LoadingButton>
-            <LoadingButton variant='contained' disabled={isAuthenticating} startIcon={<Facebook />} onClick={() => onSignInClick(Providers.facebook)}>Log in with Facebook</LoadingButton>
+            <Button sx={{ backgroundColor: '#4285F4' }} variant='contained' disabled={isAuthenticating} startIcon={<Google />} onClick={() => onSignInClick(Providers.google)}>Log in with Google</Button>
+            <Button sx={{ backgroundColor: '#3b5998' }} variant='contained' disabled={isAuthenticating} startIcon={<Facebook />} onClick={() => onSignInClick(Providers.facebook)}>Log in with Facebook</Button>
         </Box>
     </Container>
 };

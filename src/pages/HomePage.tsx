@@ -14,7 +14,7 @@ const HomePage: React.FC = () => {
     };
 
     return <Container>
-        <Typography variant='h3'>Create a new event!</Typography>
+        <Typography variant='h3' sx={{ my: 2 }}>Create a new event!</Typography>
         <EventForm onFormSubmit={onSubmit} />
     </Container>;
 };

@@ -80,7 +80,7 @@ const EventForm: React.FC<EventFormProps> = ({ onFormSubmit }) => {
 
         <MultipleDatesPicker inputFormat='DD/MM/YYYY' minDate={now} values={values} setValues={setValues} />
 
-        <Button variant='contained' type='submit' disabled={submitting}>Submit</Button>
+        <Button variant='contained' type='submit' disabled={submitting}>Create event</Button>
     </Box>;
 };
 
