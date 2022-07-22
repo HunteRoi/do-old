@@ -1,4 +1,4 @@
-import { Box, Container, Link, Typography } from "@mui/material";
+import { Box, Container, Link, Typography } from '@mui/material';
 
 const Copyright: React.FC = () => {
     return <Typography variant='body2' color='text.secondary'>

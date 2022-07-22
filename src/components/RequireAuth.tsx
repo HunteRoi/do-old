@@ -1,6 +1,6 @@
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 
 type RequireAuthProps = {
@@ -10,6 +10,7 @@ type RequireAuthProps = {
 const RequireAuth: React.FC<RequireAuthProps> = ({ routeWhenUnauthenticated, children }) => {
     const auth = getAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -17,7 +18,7 @@ const RequireAuth: React.FC<RequireAuthProps> = ({ routeWhenUnauthenticated, chi
             if (user) {
                 setLoading(false);
             } else {
-                navigate(routeWhenUnauthenticated);
+                navigate(routeWhenUnauthenticated, { state: { from: location.pathname } });
             }
         });
 

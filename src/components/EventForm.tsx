@@ -51,7 +51,7 @@ const EventForm: React.FC<EventFormProps> = ({ onFormSubmit }) => {
                 attendeesChoices: []
             })),
             creationDate: Timestamp.fromDate(dayjs().hour(0).minute(0).second(0).millisecond(0).toDate()),
-            creator: { ...providerData, photoURL }
+            creator: { ...providerData, id: auth.currentUser!.uid, photoURL }
         };
         await onFormSubmit(newEvent);
         setSubmitting(false);

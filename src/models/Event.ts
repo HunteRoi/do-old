@@ -9,5 +9,5 @@ export type Event = {
     description?: string | null;
     attendanceData: AttendanceData[];
     creationDate: Timestamp;
-    creator: UserInfo;
+    creator: UserInfo & { id: string };
 };

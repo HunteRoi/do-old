@@ -1,27 +1,37 @@
 import { getAuth } from 'firebase/auth';
-import { Avatar, Typography } from '@mui/material';
-import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
+import { Avatar, Button, Typography } from '@mui/material';
+import { DataGrid, GridActionsCellItem, GridEventListener, GridRenderCellParams, GridRowId, GridRowModel, GridRowModes, GridRowModesModel, GridRowParams, GridRowsProp, GridToolbarContainer, MuiEvent } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
 import { UserInfo } from 'firebase/auth';
 import { Timestamp } from 'firebase/firestore';
+import { Add, Cancel, Delete, Edit, Save } from '@mui/icons-material';
 
-import { AttendanceData, AttendingChoices, ChoiceStatus, ChoiceStatusEnum } from '../models';
+import { AttendanceData, AttendingChoices, Choice, ChoiceStatus, ChoiceStatusEnum } from '../models';
 import ThreeStateCheckbox from './ThreeStateCheckbox';
+import React, { useEffect, useState } from 'react';
+import getPhotoURL from '../hooks/getPhotoURL';
 
 type ParticipationFormProps = {
     attendanceData: AttendanceData[];
-    onFormSubmit: (data: AttendingChoices) => Promise<void>
+    onFormSubmit: (data: AttendingChoices, shouldDelete: boolean) => Promise<void>
 };
 
 type AttendeeChoicesPerDate = {
-    attendee: UserInfo,
+    attendee: UserInfo & { id: string },
     dateChoices: DateChoice[];
 }
 
 type DateChoice = { timestamp: Timestamp, choice: ChoiceStatus };
 
-const ParticipationForm: React.FC<ParticipationFormProps> = ({ attendanceData }) => {
+type EditToolbarProps = {
+    setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void,
+    setRowModesModel: (newModel: (oldModel: GridRowModesModel) => GridRowModesModel) => void
+};
+
+const ParticipationForm: React.FC<ParticipationFormProps> = ({ attendanceData, onFormSubmit }) => {
     const auth = getAuth();
+    const [rows, setRows] = useState<GridRowsProp[]>([]);
+    const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
     const columns = [
         {
             headerName: 'Attendees',
@@ -35,11 +45,44 @@ const ParticipationForm: React.FC<ParticipationFormProps> = ({ attendanceData })
             flex: .3,
             minWidth: 200
         },
+        {
+            field: 'actions',
+            type: 'actions',
+            headerName: 'Actions',
+            width: 100,
+            cellClassName: 'actions',
+            getActions: (props: any) => {
+                const { id } = props;
+                const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+
+                if (isInEditMode) {
+                    return [
+                        <GridActionsCellItem icon={<Save />} label='Save' onClick={handleSaveClick(id)} color='inherit' />,
+                        <GridActionsCellItem icon={<Cancel />} label='Cancel' onClick={handleCancelClick(id)} color='inherit' />,
+                    ];
+                }
+
+                return [
+                    <GridActionsCellItem
+                        icon={<Edit />}
+                        label='Edit'
+                        onClick={handleEditClick(id)}
+                        color='inherit'
+                    />,
+                    <GridActionsCellItem
+                        icon={<Delete />}
+                        label='Delete'
+                        onClick={handleDeleteClick(id)}
+                        color='inherit'
+                    />,
+                ];
+            },
+        },
         ...attendanceData
             .map(d => ({
                 flex: .2,
                 minWidth: 150,
-                field: `${d.date.valueOf()}-choice`,
+                field: `${d.date.toMillis()}-choice`,
                 renderHeader: () => (
                     <Typography>{dayjs(d.date.toDate()).format('DD/MM/YYYY')}</Typography>
                 ),
@@ -47,34 +90,104 @@ const ParticipationForm: React.FC<ParticipationFormProps> = ({ attendanceData })
                 renderCell: (params: GridRenderCellParams<ChoiceStatus>) => (
                     <ThreeStateCheckbox state={params.value} />
                 ),
-                valueOptions: [ChoiceStatusEnum.GOING, ChoiceStatusEnum.MAYBE, 'NONE'],
+                valueOptions: [{ value: ChoiceStatusEnum.GOING, label: 'Going' }, { value: ChoiceStatusEnum.MAYBE, label: 'Maybe' }, { value: ChoiceStatusEnum.NOT_GOING, label: 'Not going' }],
                 type: 'singleSelect'
             }))
     ];
+    const EditToolbar = (props: EditToolbarProps) => {
+        const { setRows, setRowModesModel } = props;
+        const handleClick = async () => {
+            if (!auth || !auth.currentUser) return;
 
-    const attendanceDataPerUser = attendanceData.reduce<Map<string, AttendeeChoicesPerDate>>((seed, current) => {
-        for(const attendeeChoice of current.attendeesChoices) {
-            if (seed.has(attendeeChoice.attendee.uid)) {
-                seed.get(attendeeChoice.attendee.uid)!.dateChoices.push({
-                    timestamp: current.date,
-                    choice: attendeeChoice.status
-                });
-            } else {
-                seed.set(attendeeChoice.attendee.uid, { attendee: attendeeChoice.attendee, dateChoices: [{ timestamp: current.date, choice: attendeeChoice.status }] });
+            const id = auth.currentUser.uid;
+            const isNew = rows.every((row: any) => row.id !== id);
+
+            if (isNew) {
+                const providerData = auth.currentUser.providerData[0];
+                const photoURL = await getPhotoURL(providerData);
+                const attendee = { ...providerData, id, photoURL };
+
+                const newRow: any = { id, attendee };
+                for(const date of attendanceData.map(data => data.date)) {
+                    newRow[`${date.toMillis()}-choice`] = ChoiceStatusEnum.NOT_GOING;
+                }
+
+                setRows((oldRows) => [...oldRows, newRow]);
             }
+            setRowModesModel((oldModel) => ({ ...oldModel, [id]: { mode: GridRowModes.Edit }}));
+        };
+
+        return <GridToolbarContainer>
+            <Button color='primary' startIcon={<Add />} onClick={handleClick}>Add</Button>
+        </GridToolbarContainer>
+    };
+    const handleRowEditStart = (_: GridRowParams, event: MuiEvent<React.SyntheticEvent>) => {
+        event.defaultMuiPrevented = true;
+    };
+    const handleRowEditStop: GridEventListener<'rowEditStop'> = (_, event) => {
+        event.defaultMuiPrevented = true;
+    };
+    const processRowUpdate = (newRow: GridRowModel) => {
+        setRows(rows.map((row: any) => (row.id === newRow.id) ? newRow : row));
+        const choices: Choice[] = [];
+        for(const prop in newRow) {
+            if (!prop.endsWith('-choice')) continue;
+            const unixTimestamp = parseInt(prop.split('-choice')[0]);
+            const date = Timestamp.fromMillis(unixTimestamp);
+            const status = newRow[prop] === '' ? null : newRow[prop];
+            choices.push({ date, status });
         }
-        return seed;
-    }, new Map());
+        onFormSubmit({ attendee: newRow.attendee, choices }, false);
+        return newRow;
+    };
+    const handleEditClick = (id: GridRowId) => () => {
+        setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+    };
+    const handleSaveClick = (id: GridRowId) => () => {
+        setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
+    };
+    const handleDeleteClick = (id: GridRowId) => () => {
+        const deletedRow: any = rows.find((row: any) => row.id === id);
+        onFormSubmit({ attendee: deletedRow.attendee, choices: [] }, true);
+        setRows(rows.filter((row: any) => row.id !== id));
+    };
+    const handleCancelClick = (id: GridRowId) => () => {
+        setRowModesModel({
+        ...rowModesModel,
+        [id]: { mode: GridRowModes.View, ignoreModifications: true },
+        });
 
-    const rows = [
-        ...[...attendanceDataPerUser.values()].map(data => {
-            const row: any = { attendee: data.attendee, id: data.attendee.uid, editable: auth.currentUser?.uid === data.attendee.uid };
-            for(const dateChoice of data.dateChoices) {
-                row[`${dateChoice.timestamp.valueOf()}-choice`] = dateChoice.choice;
+        const editedRow: any = rows.find((row: any) => row.id === id);
+        if (editedRow?.isNew) {
+            setRows(rows.filter((row: any) => row.id !== id));
+        }
+    };
+
+    useEffect(() => {
+        const attendanceDataPerUser = attendanceData.reduce<Map<string, AttendeeChoicesPerDate>>((seed, current) => {
+            for(const attendeeChoice of current.attendeesChoices) {
+                if (seed.has(attendeeChoice.attendee.id)) {
+                    seed.get(attendeeChoice.attendee.id)!.dateChoices.push({
+                        timestamp: current.date,
+                        choice: attendeeChoice.status
+                    });
+                } else {
+                    seed.set(attendeeChoice.attendee.id, { attendee: attendeeChoice.attendee, dateChoices: [{ timestamp: current.date, choice: attendeeChoice.status }] });
+                }
             }
-            return row;
-        })
-    ];
+            return seed;
+        }, new Map());
+
+        setRows([
+            ...[...attendanceDataPerUser.values()].map(data => {
+                const row: any = { attendee: data.attendee, id: data.attendee.id, editable: true };
+                for(const dateChoice of data.dateChoices) {
+                    row[`${dateChoice.timestamp.toMillis()}-choice`] = dateChoice.choice;
+                }
+                return row;
+            })
+        ]);
+    }, [attendanceData]);
 
     return <DataGrid
         autoHeight
@@ -83,6 +196,16 @@ const ParticipationForm: React.FC<ParticipationFormProps> = ({ attendanceData })
         columns={columns}
         rows={rows}
         editMode='row'
+        rowModesModel={rowModesModel}
+        onRowEditStart={handleRowEditStart}
+        onRowEditStop={handleRowEditStop}
+        processRowUpdate={processRowUpdate}
+        components={{
+          Toolbar: EditToolbar,
+        }}
+        componentsProps={{
+          toolbar: { setRows, setRowModesModel },
+        }}
     />;
 };
 

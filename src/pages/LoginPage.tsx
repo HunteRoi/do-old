@@ -3,7 +3,7 @@ import { LoadingButton } from '@mui/lab';
 import { Facebook, Google } from '@mui/icons-material';
 import { FacebookAuthProvider, getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { useState } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { useNavigate, Navigate, useLocation } from 'react-router-dom';
 
 import { Providers, signIn } from '../config/firebase';
 
@@ -11,11 +11,15 @@ const LoginPage: React.FC = () => {
     const auth = getAuth();
     const [isAuthenticating, setAuthenticating] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
 
     const onSignInClick = async (provider: GoogleAuthProvider | FacebookAuthProvider) => {
         setAuthenticating(true);
         await signIn(provider);
-        navigate('/');
+        if (location.state && (location.state as any).from) {
+            navigate((location.state as any).from)
+        }
+        else navigate('/');
     };
 
     if (auth.currentUser) {

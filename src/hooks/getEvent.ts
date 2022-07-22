@@ -1,6 +1,6 @@
-import { doc, getFirestore, onSnapshot, updateDoc, CollectionReference, collection } from 'firebase/firestore';
+import { doc, getFirestore, onSnapshot, updateDoc, CollectionReference, collection, deleteDoc } from 'firebase/firestore';
 import { useEffect, useState, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { AttendanceData, AttendingChoices, Choice, Event } from '../models';
 
@@ -11,26 +11,48 @@ function getDateAsMilliseconds(data: AttendanceData | Choice) {
 type GetEventReturnType = {
     event: Event | null,
     loading: boolean,
-    updateAttendance: (data: AttendingChoices) => Promise<void>
+    updateAttendance: (data: AttendingChoices, shouldDelete: boolean) => Promise<void>,
+    deleteEvent: () => Promise<void>
 };
 
 const getEvent = (): GetEventReturnType => {
+    const navigate = useNavigate();
     const params = useParams();
     const [loading, setLoading] = useState(true);
     const [event, setEvent] = useState<Event | null>(null);
     const db = getFirestore();
 
-    const updateAttendance = useMemo(() => async (data: AttendingChoices) => {
+    const updateAttendance = useMemo(() => async (data: AttendingChoices, shouldDelete: boolean = false) => {
         if (!event) return;
         const docRef = doc(db, 'events', event.id);
         const attendanceData = [...event.attendanceData];
         for (const attendance of attendanceData) {
             const choiceForDate = data.choices.filter(c => getDateAsMilliseconds(c) === getDateAsMilliseconds(attendance))[0];
-            const index = attendance.attendeesChoices.findIndex(ac => ac.attendee.uid === data.attendee.uid);
+            const index = attendance.attendeesChoices.findIndex(ac => ac.attendee.id === data.attendee.id);
             if (index === -1) attendance.attendeesChoices.push({ attendee: data.attendee, status: choiceForDate?.status ?? null });
+            else if (shouldDelete) attendance.attendeesChoices.splice(index, 1);
             else attendance.attendeesChoices[index].status = choiceForDate?.status ?? null;
         }
-        await updateDoc(docRef, 'attendanceData', attendanceData);
+
+        try {
+            await updateDoc(docRef, 'attendanceData', attendanceData);
+        }
+        catch (err) {
+            console.error(err);
+            navigate('/');
+        }
+    }, [event]);
+
+    const deleteEvent = useMemo(() => async () => {
+        if (!event) return;
+        const docRef = doc(db, 'events', event.id);
+        try {
+            await deleteDoc(docRef);
+        }
+        catch (err) {
+            console.error(err);
+            navigate('/');
+        }
     }, [event]);
 
     useEffect(() => {
@@ -45,7 +67,7 @@ const getEvent = (): GetEventReturnType => {
         });
     }, [params]);
 
-    return { event, loading, updateAttendance };
+    return { event, loading, updateAttendance, deleteEvent };
 };
 
 export default getEvent;
