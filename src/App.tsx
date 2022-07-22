@@ -2,6 +2,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material';
+import dayjs from 'dayjs';
+import 'dayjs/locale/en-au';
+dayjs.locale('en-au'); // to get monday as first weekday
 
 import Layout from './components/Layout';
 import RequireAuth from './components/RequireAuth';

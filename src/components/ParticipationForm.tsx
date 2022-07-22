@@ -81,10 +81,10 @@ const ParticipationForm: React.FC<ParticipationFormProps> = ({ attendanceData, o
         ...attendanceData
             .map(d => ({
                 flex: .2,
-                minWidth: 150,
+                minWidth: 200,
                 field: `${d.date.toMillis()}-choice`,
                 renderHeader: () => (
-                    <Typography>{dayjs(d.date.toDate()).format('DD/MM/YYYY')}</Typography>
+                    <Typography>{dayjs(d.date.toDate()).format('dddd DD/MM/YYYY')}</Typography>
                 ),
                 editable: true,
                 renderCell: (params: GridRenderCellParams<ChoiceStatus>) => (

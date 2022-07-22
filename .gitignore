@@ -7,6 +7,8 @@ src/config/index.ts
 *.cjs.map
 *.mjs.map
 
+/.firebase/**
+/build/**
 /node_modules/**
 /.yarn/*
 !/.yarn/cache
