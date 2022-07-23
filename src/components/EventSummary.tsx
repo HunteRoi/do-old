@@ -1,9 +1,9 @@
 import { Box, Button, Container, Typography } from '@mui/material';
-import { Delete, FormatAlignLeft, Share } from '@mui/icons-material';
+import { Delete, EventAvailable, FormatAlignLeft, PeopleAlt, Share } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
-import { Event, AttendingChoices} from '../models';
+import { Event, AttendingChoices, ChoiceStatusEnum } from '../models';
 import ParticipationForm from '../components/ParticipationForm';
 import { getAuth } from 'firebase/auth';
 
@@ -39,6 +39,22 @@ const EventSummary: React.FC<EventSummaryProps> = ({ event, onSubmit, onDelete }
         }
       };
 
+
+    const numberOfParticiants = event.attendanceData[0].attendeesChoices.length;
+    const bestSpot = event.attendanceData.reduce((seed, current) => {
+        const ratioGoing = current.attendeesChoices.filter(ac => ac.status === ChoiceStatusEnum.GOING).length;
+        const ratioMaybe = current.attendeesChoices.filter(ac => ac.status === ChoiceStatusEnum.MAYBE).length / 2;
+        const ratio = ratioGoing + ratioMaybe;
+
+        if (seed.ratio < ratio) {
+            seed.ratio = ratio;
+            seed.date = current.date.toMillis();
+        }
+
+        return seed;
+    }, { ratio: 0, date: 0 });
+    const bestDate = bestSpot.ratio <= 1 ? 'No date yet' : dayjs(bestSpot.date).format('dddd DD/MM/YYYY');
+
     return <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }} maxWidth='xl'>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', my: 3 }}>
             <Typography variant='h4'>{event.title}</Typography>
@@ -47,10 +63,22 @@ const EventSummary: React.FC<EventSummaryProps> = ({ event, onSubmit, onDelete }
             </Typography>
         </Box>
 
-        {event.description && <Box sx={{ display: 'flex', flexDirection: 'row', my: 3 }}>
-            <FormatAlignLeft fontSize='small' sx={{ mr: 2 }} />
-            <Typography>{event.description}</Typography>
-        </Box>}
+        <Box sx={{ display: 'flex', flexDirection: 'column', my: 3 }}>
+            {event.description && <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                <FormatAlignLeft fontSize='small' sx={{ mr: 2 }} />
+                <Typography>{event.description}</Typography>
+            </Box>}
+
+            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                <PeopleAlt fontSize='small' sx={{ mr: 2 }} />
+                <Typography>Participants: {numberOfParticiants}</Typography>
+            </Box>
+
+            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                <EventAvailable fontSize='small' sx={{ mr: 2 }} />
+                <Typography>Best date: {bestDate}</Typography>
+            </Box>
+        </Box>
 
         <ParticipationForm attendanceData={event.attendanceData} onFormSubmit={onSubmit} />
 

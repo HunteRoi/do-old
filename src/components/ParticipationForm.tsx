@@ -1,10 +1,9 @@
-import { getAuth } from 'firebase/auth';
+import { getAuth, UserInfo } from 'firebase/auth';
 import { Avatar, Button, Typography } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridEventListener, GridRenderCellParams, GridRowId, GridRowModel, GridRowModes, GridRowModesModel, GridRowParams, GridRowsProp, GridToolbarContainer, MuiEvent } from '@mui/x-data-grid';
-import dayjs from 'dayjs';
-import { UserInfo } from 'firebase/auth';
-import { Timestamp } from 'firebase/firestore';
 import { Add, Cancel, Delete, Edit, Save } from '@mui/icons-material';
+import { Timestamp } from 'firebase/firestore';
+import dayjs from 'dayjs';
 
 import { AttendanceData, AttendingChoices, Choice, ChoiceStatus, ChoiceStatusEnum } from '../models';
 import ThreeStateCheckbox from './ThreeStateCheckbox';
@@ -201,10 +200,10 @@ const ParticipationForm: React.FC<ParticipationFormProps> = ({ attendanceData, o
         onRowEditStop={handleRowEditStop}
         processRowUpdate={processRowUpdate}
         components={{
-          Toolbar: EditToolbar,
+            Toolbar: EditToolbar,
         }}
         componentsProps={{
-          toolbar: { setRows, setRowModesModel },
+            toolbar: { setRows, setRowModesModel },
         }}
     />;
 };
