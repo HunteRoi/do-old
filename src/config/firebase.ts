@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, AuthProvider, getAuth } from 'firebase/auth';
+import { GoogleAuthProvider, FacebookAuthProvider, AuthProvider, getAuth, signInWithRedirect } from 'firebase/auth';
 import { doc, getFirestore, setDoc } from 'firebase/firestore';
 
 import { Event } from '../models';
@@ -17,7 +17,7 @@ export const Providers = {
 export const signIn = async (provider: AuthProvider) => {
     auth.useDeviceLanguage();
     try {
-        await signInWithPopup(auth, provider);
+        await signInWithRedirect(auth, provider);
     } catch (err) {
         console.error(err);
     }

@@ -13,6 +13,8 @@ import EventPage from './pages/EventPage';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import { dooldTheme } from './theme';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsPage from './pages/TermsPage';
 
 const App: React.FC = () => {
   return (
@@ -24,6 +26,8 @@ const App: React.FC = () => {
               <Route path='/login' element={<UnRequireAuth routeWhenAuthenticated='/'><LoginPage /></UnRequireAuth>} />
               <Route path='/' element={<RequireAuth routeWhenUnauthenticated='/login'><HomePage /></RequireAuth>} />
               <Route path='/event/:id' element={<RequireAuth routeWhenUnauthenticated='/login'><EventPage /></RequireAuth>} />
+              <Route path='/privacypolicy' element={<PrivacyPolicyPage />} />
+              <Route path='/terms' element={<TermsPage />} />
               <Route path='*' element={<Navigate to='/' />} />
             </Routes>
           </Layout>

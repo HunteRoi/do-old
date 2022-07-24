@@ -16,7 +16,7 @@ type EventFormProps = {
 };
 
 const EventForm: React.FC<EventFormProps> = ({ onFormSubmit }) => {
-    const now = dayjs().hour(0).minute(0).second(0).millisecond(0);
+    const now = dayjs();
     const titleInput = useFormElement<HTMLInputElement, string>('');
     const descriptionInput = useFormElement<HTMLTextAreaElement, string>('');
     const [values, setValues] = useState([
@@ -50,7 +50,7 @@ const EventForm: React.FC<EventFormProps> = ({ onFormSubmit }) => {
                 date: Timestamp.fromDate(day.hour(0).minute(0).second(0).millisecond(0).toDate()),
                 attendeesChoices: []
             })),
-            creationDate: Timestamp.fromDate(dayjs().hour(0).minute(0).second(0).millisecond(0).toDate()),
+            creationDate: Timestamp.fromDate(now.toDate()),
             creator: { ...providerData, id: auth.currentUser!.uid, photoURL }
         };
         await onFormSubmit(newEvent);

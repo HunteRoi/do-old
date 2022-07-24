@@ -27,11 +27,16 @@ const LoginPage: React.FC = () => {
        return <Navigate to='/' />;
     }
 
-    return <Container maxWidth='xs' sx={{ my: 5 }}>
+    return <Container maxWidth='sm' sx={{ my: 5 }}>
         <Box sx={{ my: 2 }}>
-            <Typography variant='h3' sx={{ my: 1 }}>
-                Welcome on DoOld, a clone of the old Doodle interface!
-            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <Typography variant='h3'>
+                    Welcome on DoOld
+                </Typography>
+                <Typography variant='subtitle1' component='p' sx={{ mb: 2 }}>
+                    a clone of the old Doodle interface!
+                </Typography>
+            </Box>
             <Typography variant='body1'>
                 Here, no need to fill impossible forms only to know when your friends are available for a drink.
                 <br />
@@ -43,7 +48,7 @@ const LoginPage: React.FC = () => {
             </Typography>
         </Box>
 
-        <Box sx={{ display: 'grid', gap: 1, gridTemplateRows: 'repeat(2, 1fr)' }}>
+        <Box sx={{ display: 'grid', gap: 1, gridTemplateRows: 'repeat(2, 1fr)', mt: 5 }}>
             <Button sx={{ backgroundColor: '#4285F4' }} variant='contained' disabled={isAuthenticating} startIcon={<Google />} onClick={() => onSignInClick(Providers.google)}>Log in with Google</Button>
             <Button sx={{ backgroundColor: '#3b5998' }} variant='contained' disabled={isAuthenticating} startIcon={<Facebook />} onClick={() => onSignInClick(Providers.facebook)}>Log in with Facebook</Button>
         </Box>
