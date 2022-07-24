@@ -58,7 +58,7 @@ const EventSummary: React.FC<EventSummaryProps> = ({ event, onSubmit, onDelete }
 
             <Box sx={{ display: 'flex', flexDirection: 'row' }}>
                 <PeopleAlt fontSize='small' sx={{ mr: 2 }} />
-                <Typography>Participants: {numberOfParticiants}</Typography>
+                <Typography>Attendees: {numberOfParticiants}</Typography>
             </Box>
 
             <Box sx={{ display: 'flex', flexDirection: 'row' }}>

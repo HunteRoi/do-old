@@ -20,7 +20,7 @@ const Footer: React.FC = () => {
                 : theme.palette.grey[800]
         }}>
         <Container maxWidth='sm' sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <Typography variant='body1'>This is my personal Doodle-like app because the official one sucks ass</Typography>
+            <Typography variant='body1' textAlign='center'>This is my personal Doodle-like app because the official one sucks ass</Typography>
             <Copyright />
             <Box sx={{ mt: 1, mx: 0 }}>
                 <Link to='/privacypolicy'>

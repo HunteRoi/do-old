@@ -6,7 +6,6 @@ import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import getPhotoURL from '../hooks/getPhotoURL';
 import { Link, useNavigate } from 'react-router-dom';
 import { signOut } from '../config/firebase';
-import NewBadge from './NewBadge';
 
 const Header: React.FC = () => {
     const auth = getAuth();
@@ -70,11 +69,9 @@ const Header: React.FC = () => {
 
                 { auth && auth.currentUser && <Box sx={{ flexGrow: 0 }}>
                     <Tooltip title='Open settings'>
-                        <NewBadge>
-                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar alt={auth.currentUser.displayName ?? undefined} src={photoURL ?? undefined} />
-                            </IconButton>
-                        </NewBadge>
+                        <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                            <Avatar alt={auth.currentUser?.displayName ?? undefined} src={photoURL ?? undefined} />
+                        </IconButton>
                     </Tooltip>
                     <Menu
                         sx={{ mt: '45px' }}
@@ -96,7 +93,7 @@ const Header: React.FC = () => {
                             <Typography variant='inherit'>Via {provider}</Typography>
                         </MenuItem>
                         <Divider />
-                        <MenuItem key='events' onClick={onCreateNewClick}>
+                        <MenuItem key='createnew' onClick={onCreateNewClick}>
                             <ListItemIcon>
                                 <EventOutlined fontSize='small'/>
                             </ListItemIcon>
@@ -106,9 +103,7 @@ const Header: React.FC = () => {
                         </MenuItem>
                         <MenuItem key='events' onClick={onEventsClick}>
                             <ListItemIcon>
-                                <NewBadge>
-                                    <CalendarMonth fontSize='small'/>
-                                </NewBadge>
+                                <CalendarMonth fontSize='small'/>
                             </ListItemIcon>
                             <ListItemText>
                                 <Typography textAlign='center'>Your events</Typography>

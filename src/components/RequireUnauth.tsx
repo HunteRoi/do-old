@@ -15,7 +15,11 @@ const RequireUnauth: React.FC<RequireUnauthProps> = ({ routeWhenAuthenticated, c
     useEffect(() => {
         const checkAuthentication = onAuthStateChanged(auth, (user: User | null) => {
             if (user) {
-                navigate(routeWhenAuthenticated);
+                let to = routeWhenAuthenticated;
+                if (window.location.hash !== '') {
+                    to = window.location.hash.substring(1);
+                }
+                navigate(to);
             } else {
                 setLoading(false);
             }

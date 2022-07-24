@@ -1,6 +1,6 @@
-import dayjs from "dayjs";
+import dayjs from 'dayjs';
 
-import { ChoiceStatusEnum, Event } from "../models";
+import { ChoiceStatusEnum, Event } from '../models';
 
 const getEventStats = (event: Event) => {
     const numberOfParticiants = event.attendanceData[0].attendeesChoices.length;

@@ -10,7 +10,7 @@ const EventPage: React.FC = () => {
 
     const handleDelete = async () => {
         await deleteEvent();
-        navigate('/');
+        navigate(-1);
     };
 
     if (loading) return <CircularProgress aria-label='Loading...' />;
