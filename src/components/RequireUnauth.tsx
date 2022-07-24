@@ -3,11 +3,11 @@ import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 
-type RequireAuthProps = {
+type RequireUnauthProps = {
     routeWhenAuthenticated: string
 } & PropsWithChildren;
 
-const UnRequireAuth: React.FC<RequireAuthProps> = ({ routeWhenAuthenticated, children }) => {
+const RequireUnauth: React.FC<RequireUnauthProps> = ({ routeWhenAuthenticated, children }) => {
     const auth = getAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
@@ -29,4 +29,4 @@ const UnRequireAuth: React.FC<RequireAuthProps> = ({ routeWhenAuthenticated, chi
     return <>{children}</>;
 };
 
-export default UnRequireAuth;
+export default RequireUnauth;

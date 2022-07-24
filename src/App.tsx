@@ -9,7 +9,7 @@ dayjs.locale('en-au'); // to get monday as first weekday
 import { dooldTheme } from './theme';
 import Layout from './components/Layout';
 import RequireAuth from './components/RequireAuth';
-import UnRequireAuth from './components/UnRequireAuth';
+import RequireUnauth from './components/RequireUnauth';
 import EventPage from './pages/EventPage';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -25,7 +25,7 @@ const App: React.FC = () => {
         <BrowserRouter>
           <Layout>
             <Routes>
-              <Route path='/login' element={<UnRequireAuth routeWhenAuthenticated='/'><LoginPage /></UnRequireAuth>} />
+              <Route path='/login' element={<RequireUnauth routeWhenAuthenticated='/'><LoginPage /></RequireUnauth>} />
               <Route path='/' element={<RequireAuth routeWhenUnauthenticated='/login'><HomePage /></RequireAuth>} />
               <Route path='/new' element={<RequireAuth routeWhenUnauthenticated='/login'><NewEventPage /></RequireAuth>} />
               <Route path='/events' element={<RequireAuth routeWhenUnauthenticated='/login'><EventsPage /></RequireAuth>} />
