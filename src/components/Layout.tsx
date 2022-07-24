@@ -6,7 +6,7 @@ import Footer from './Footer';
 const Layout: React.FC<PropsWithChildren> = ({ children }) => {
     return <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <Header />
-        <Container component='main' sx={{ mt: 2, mb: 2 }} maxWidth='lg' >
+        <Container component='main' sx={{ mt: 1, mb: 1 }} maxWidth='lg' >
             {children}
         </Container>
         <Footer />

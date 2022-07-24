@@ -3,9 +3,10 @@ import { Delete, EventAvailable, FormatAlignLeft, PeopleAlt, Share } from '@mui/
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
-import { Event, AttendingChoices, ChoiceStatusEnum } from '../models';
+import { Event, AttendingChoices } from '../models';
 import ParticipationForm from '../components/ParticipationForm';
 import { getAuth } from 'firebase/auth';
+import getEventStats from '../hooks/getEventStats';
 
 dayjs.extend(relativeTime);
 
@@ -39,21 +40,7 @@ const EventSummary: React.FC<EventSummaryProps> = ({ event, onSubmit, onDelete }
         }
       };
 
-
-    const numberOfParticiants = event.attendanceData[0].attendeesChoices.length;
-    const bestSpot = event.attendanceData.reduce((seed, current) => {
-        const ratioGoing = current.attendeesChoices.filter(ac => ac.status === ChoiceStatusEnum.GOING).length;
-        const ratioMaybe = current.attendeesChoices.filter(ac => ac.status === ChoiceStatusEnum.MAYBE).length / 2;
-        const ratio = ratioGoing + ratioMaybe;
-
-        if (seed.ratio < ratio) {
-            seed.ratio = ratio;
-            seed.date = current.date.toMillis();
-        }
-
-        return seed;
-    }, { ratio: 0, date: 0 });
-    const bestDate = bestSpot.ratio <= 1 ? 'No date yet' : dayjs(bestSpot.date).format('dddd DD/MM/YYYY');
+    const { numberOfParticiants, bestDate } = getEventStats(event);
 
     return <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }} maxWidth='xl'>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', my: 3 }}>

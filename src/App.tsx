@@ -6,15 +6,17 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/en-au';
 dayjs.locale('en-au'); // to get monday as first weekday
 
+import { dooldTheme } from './theme';
 import Layout from './components/Layout';
 import RequireAuth from './components/RequireAuth';
 import UnRequireAuth from './components/UnRequireAuth';
 import EventPage from './pages/EventPage';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
-import { dooldTheme } from './theme';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsPage from './pages/TermsPage';
+import EventsPage from './pages/EventsPage';
+import NewEventPage from './pages/NewEventPage';
 
 const App: React.FC = () => {
   return (
@@ -25,6 +27,8 @@ const App: React.FC = () => {
             <Routes>
               <Route path='/login' element={<UnRequireAuth routeWhenAuthenticated='/'><LoginPage /></UnRequireAuth>} />
               <Route path='/' element={<RequireAuth routeWhenUnauthenticated='/login'><HomePage /></RequireAuth>} />
+              <Route path='/new' element={<RequireAuth routeWhenUnauthenticated='/login'><NewEventPage /></RequireAuth>} />
+              <Route path='/events' element={<RequireAuth routeWhenUnauthenticated='/login'><EventsPage /></RequireAuth>} />
               <Route path='/event/:id' element={<RequireAuth routeWhenUnauthenticated='/login'><EventPage /></RequireAuth>} />
               <Route path='/privacypolicy' element={<PrivacyPolicyPage />} />
               <Route path='/terms' element={<TermsPage />} />

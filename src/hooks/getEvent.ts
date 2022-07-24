@@ -26,16 +26,21 @@ const getEvent = (): GetEventReturnType => {
         if (!event) return;
         const docRef = doc(db, 'events', event.id);
         const attendanceData = [...event.attendanceData];
+        let attendees: string[] = [];
         for (const attendance of attendanceData) {
             const choiceForDate = data.choices.filter(c => getDateAsMilliseconds(c) === getDateAsMilliseconds(attendance))[0];
             const index = attendance.attendeesChoices.findIndex(ac => ac.attendee.id === data.attendee.id);
-            if (index === -1) attendance.attendeesChoices.push({ attendee: data.attendee, status: choiceForDate?.status ?? null });
+
+            if (index === -1) attendance.attendeesChoices.push({ attendee: data.attendee, id: data.id, status: choiceForDate?.status ?? null });
             else if (shouldDelete) attendance.attendeesChoices.splice(index, 1);
             else attendance.attendeesChoices[index].status = choiceForDate?.status ?? null;
+
+            attendees = [...new Set(attendance.attendeesChoices.map(ac => ac.id))];
         }
 
         try {
             await updateDoc(docRef, 'attendanceData', attendanceData);
+            await updateDoc(docRef, 'attendees', attendees);
         }
         catch (err) {
             console.error(err);
@@ -59,7 +64,7 @@ const getEvent = (): GetEventReturnType => {
         if (!params.id) return;
         const events = collection(db, 'events') as CollectionReference<Event>;
         const docRef = doc<Event>(events, params.id);
-        return onSnapshot(docRef, async (snapshot) => {
+        return onSnapshot(docRef, snapshot => {
             if (!snapshot || !snapshot.data()) return setLoading(false);
 
             setEvent(snapshot.data() ?? null);

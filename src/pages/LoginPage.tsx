@@ -30,20 +30,19 @@ const LoginPage: React.FC = () => {
     return <Container maxWidth='sm' sx={{ my: 5 }}>
         <Box sx={{ my: 2 }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <Typography variant='h3'>
-                    Welcome on DoOld
-                </Typography>
+                <Typography variant='h3'>Welcome on DoOld</Typography>
                 <Typography variant='subtitle1' component='p' sx={{ mb: 2 }}>
                     a clone of the old Doodle interface!
                 </Typography>
             </Box>
-            <Typography variant='body1'>
+
+            <Typography variant='body1' component='p'>
                 Here, no need to fill impossible forms only to know when your friends are available for a drink.
-                <br />
-                <br />
-                Give a title to your event, choose some dates and create! You then only have to share your event with your friends or colleagues and let them submit their info!
-                <br />
-                <br />
+            </Typography>
+            <Typography variant='body1' component='p'>
+                Give a title to your event, choose some dates and shoot! You then only have to share your event with your friends and let them submit their info!
+            </Typography>
+            <Typography variant='body1' component='p'>
                 And in case your friends submitted shit in their attendance, you can still edit their rows 😉
             </Typography>
         </Box>

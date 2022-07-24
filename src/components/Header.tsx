@@ -1,11 +1,12 @@
 import { AppBar, Container, IconButton, Typography, Toolbar, Box, Tooltip, Avatar, Menu, MenuItem, ListItemIcon, ListItemText, Divider } from '@mui/material';
-import { EventOutlined, LogoutOutlined } from '@mui/icons-material';
+import { CalendarMonth, EventOutlined, LogoutOutlined } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 
 import getPhotoURL from '../hooks/getPhotoURL';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { signOut } from '../config/firebase';
+import NewBadge from './NewBadge';
 
 const Header: React.FC = () => {
     const auth = getAuth();
@@ -19,6 +20,8 @@ const Header: React.FC = () => {
         handleCloseUserMenu();
         navigate('/login');
     };
+    const onEventsClick = () => navigate('/events');
+    const onCreateNewClick = () => navigate('/new');
 
     const [provider, setProvider] = useState<string | null>(null);
     const [photoURL, setPhotoURL] = useState<string | null>(null);
@@ -51,11 +54,11 @@ const Header: React.FC = () => {
     return <AppBar position='static'>
         <Container maxWidth='xl'>
             <Toolbar disableGutters>
-                <Typography component='a' href='/' sx={{ textDecoration: 'none', color: 'inherit' }}>
+                <Typography component={Link} to='/' sx={{ textDecoration: 'none', color: 'inherit' }}>
                     <EventOutlined sx={{ display: { md: 'flex' }, mr: 1 }} />
                 </Typography>
 
-                <Typography variant='h6' noWrap component='a' href='/' sx={{
+                <Typography variant='h6' noWrap component={Link} to='/' sx={{
                     mr: 2, display: { md: 'flex' },
                     fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem',
                     color: 'inherit', textDecoration: 'none'
@@ -67,9 +70,11 @@ const Header: React.FC = () => {
 
                 { auth && auth.currentUser && <Box sx={{ flexGrow: 0 }}>
                     <Tooltip title='Open settings'>
-                        <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                            <Avatar alt={auth.currentUser.displayName ?? undefined} src={photoURL ?? undefined} />
-                        </IconButton>
+                        <NewBadge>
+                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                                <Avatar alt={auth.currentUser.displayName ?? undefined} src={photoURL ?? undefined} />
+                            </IconButton>
+                        </NewBadge>
                     </Tooltip>
                     <Menu
                         sx={{ mt: '45px' }}
@@ -91,6 +96,24 @@ const Header: React.FC = () => {
                             <Typography variant='inherit'>Via {provider}</Typography>
                         </MenuItem>
                         <Divider />
+                        <MenuItem key='events' onClick={onCreateNewClick}>
+                            <ListItemIcon>
+                                <EventOutlined fontSize='small'/>
+                            </ListItemIcon>
+                            <ListItemText>
+                                <Typography textAlign='center'>Create new</Typography>
+                            </ListItemText>
+                        </MenuItem>
+                        <MenuItem key='events' onClick={onEventsClick}>
+                            <ListItemIcon>
+                                <NewBadge>
+                                    <CalendarMonth fontSize='small'/>
+                                </NewBadge>
+                            </ListItemIcon>
+                            <ListItemText>
+                                <Typography textAlign='center'>Your events</Typography>
+                            </ListItemText>
+                        </MenuItem>
                         <MenuItem key='logout' onClick={onSignOutClick}>
                             <ListItemIcon>
                                 <LogoutOutlined fontSize='small'/>

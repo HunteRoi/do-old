@@ -8,6 +8,7 @@ export type Event = {
     title: string;
     description?: string | null;
     attendanceData: AttendanceData[];
+    attendees: string[];
     creationDate: Timestamp;
     creator: UserInfo & { id: string };
 };

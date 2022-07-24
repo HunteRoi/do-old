@@ -16,6 +16,7 @@ type ParticipationFormProps = {
 };
 
 type AttendeeChoicesPerDate = {
+    id: string;
     attendee: UserInfo & { id: string },
     dateChoices: DateChoice[];
 }
@@ -136,7 +137,7 @@ const ParticipationForm: React.FC<ParticipationFormProps> = ({ attendanceData, o
             const status = newRow[prop] === '' ? null : newRow[prop];
             choices.push({ date, status });
         }
-        onFormSubmit({ attendee: newRow.attendee, choices }, false);
+        onFormSubmit({ attendee: newRow.attendee, id: newRow.attendee.id, choices }, false);
         return newRow;
     };
     const handleEditClick = (id: GridRowId) => () => {
@@ -147,7 +148,7 @@ const ParticipationForm: React.FC<ParticipationFormProps> = ({ attendanceData, o
     };
     const handleDeleteClick = (id: GridRowId) => () => {
         const deletedRow: any = rows.find((row: any) => row.id === id);
-        onFormSubmit({ attendee: deletedRow.attendee, choices: [] }, true);
+        onFormSubmit({ attendee: deletedRow.attendee, id: deletedRow.attendee.id, choices: [] }, true);
         setRows(rows.filter((row: any) => row.id !== id));
     };
     const handleCancelClick = (id: GridRowId) => () => {
@@ -171,7 +172,7 @@ const ParticipationForm: React.FC<ParticipationFormProps> = ({ attendanceData, o
                         choice: attendeeChoice.status
                     });
                 } else {
-                    seed.set(attendeeChoice.attendee.id, { attendee: attendeeChoice.attendee, dateChoices: [{ timestamp: current.date, choice: attendeeChoice.status }] });
+                    seed.set(attendeeChoice.attendee.id, { attendee: attendeeChoice.attendee, id: attendeeChoice.attendee.id, dateChoices: [{ timestamp: current.date, choice: attendeeChoice.status }] });
                 }
             }
             return seed;

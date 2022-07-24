@@ -1,22 +1,18 @@
 import { useNavigate } from 'react-router-dom';
 
-import { createEvent } from '../config/firebase';
-import EventForm from '../components/EventForm';
-import { Event } from '../models';
-import { Container, Typography } from '@mui/material';
+import { Button, Typography, Box } from '@mui/material';
+import { EventOutlined, CalendarMonth } from '@mui/icons-material';
 
 const HomePage: React.FC = () => {
     const navigate = useNavigate();
 
-    const onSubmit = async (event: Event) => {
-        await createEvent(event);
-        navigate(`/event/${event.id}`);
-    };
-
-    return <Container>
-        <Typography variant='h3' sx={{ my: 2 }}>Create a new event!</Typography>
-        <EventForm onFormSubmit={onSubmit} />
-    </Container>;
+    return <Box display='flex' flexDirection='column' justifyContent='center' alignItems='center' minHeight='75vh'>
+        <Typography variant='h3' mb={2}>Quick Access</Typography>
+        <Box display='flex' flexDirection='row' gap={1}>
+            <Button variant='contained' startIcon={<EventOutlined />} onClick={() => navigate('/new')}>Create New</Button>
+            <Button variant='outlined' startIcon={<CalendarMonth />} onClick={() => navigate('/events')}>Your Events</Button>
+        </Box>
+    </Box>;
 };
 
 export default HomePage;
